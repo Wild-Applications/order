@@ -7,8 +7,7 @@ restifyPlugins = require('restify-plugins'),
 Logger = require('bunyan'),
 corsMiddleware = require('restify-cors-middleware'),
 verifyToken = require('restify-jwt'),
-jwt = require('jsonwebtoken'),
-manageHelper = require('./helpers/order.helper.js');
+jwt = require('jsonwebtoken');
 
 //
 //
@@ -82,7 +81,7 @@ server.use(cors.actual);
 
 
 var orderRoutes = require('./routes/order.routes.js');
-tableRoutes.applyRoutes(server, '/');
+orderRoutes.applyRoutes(server, '/');
 
 
 //

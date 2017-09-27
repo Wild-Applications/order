@@ -2,13 +2,14 @@ var Router = require('restify-router').Router,
 orderRouter = new Router(),
 verifyToken = require('restify-jwt'),
 tokenHelper = require('../helpers/token.helper.js'),
-restify = require('restify');
+restify = require('restify'),
+moment = require('moment');
 
 var secret = process.env.JWT_SECRET;
 
-//var grpc = require("grpc");
-//var tableDescriptor = grpc.load(__dirname + '/../proto/table.proto').table;
-//var tableClient = new tableDescriptor.TableService('service.table:1295', grpc.credentials.createInsecure());
+var grpc = require("grpc");
+var orderDescriptor = grpc.load(__dirname + '/../proto/order.proto').order;
+var orderClient = new orderDescriptor.FulfilmentService('service.fulfilment:1295', grpc.credentials.createInsecure());
 
 
 orderRouter.get('/', function(req, res, next){
@@ -22,7 +23,28 @@ orderRouter.get('/', function(req, res, next){
 
     var metadata = new grpc.Metadata();
     metadata.add('authorization', tokenHelper.getRawToken(token));
-    tableClient.getAll({}, metadata, function(err, result){
+    orderClient.getAll({}, metadata, function(err, result){
+      if(err){
+        res.send(err)
+      }else{
+        res.send(result);
+      }
+    });
+  });
+});
+
+orderRouter.get('/:_id', function(req, res, next){
+  var token = req.header('Authorization');
+  tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
+    if(err){
+      res.status(400);
+      res.send(err);
+      return;
+    }
+
+    var metadata = new grpc.Metadata();
+    metadata.add('authorization', tokenHelper.getRawToken(token));
+    orderClient.get({_id: req.params._id}, metadata, function(err, result){
       if(err){
         res.send(err)
       }else{
@@ -42,9 +64,11 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
       res.send(err);
       return;
     }
-    var tableToCreate = req.body;
-    tableToCreate.owner = decodedToken.sub;
-    tableClient.create(tableToCreate, function(err, result){
+    var metadata = new grpc.Metadata();
+    metadata.add('authorization', tokenHelper.getRawToken(token));
+    var orderToCreate = req.body;
+    orderToCreate.owner = decodedToken.sub;
+    orderClient.create(orderToCreate, metadata, function(err, result){
       if(err){
         res.status(400);
         res.send(err);
@@ -56,25 +80,35 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
 });
 
 orderRouter.put('/:_id', function(req, res, next){
-  var token = req.header('Authorization');
-  tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
-    if(err){
-      res.status(400);
-      res.send(err);
-      return;
-    }
-    var metadata = new grpc.Metadata();
-    metadata.add('authorization', tokenHelper.getRawToken(token));
-    req.body._id = req.params._id;
-    tableClient.update(req.body, metadata, function(err, result){
+  if(req.params._id){
+    var token = req.header('Authorization');
+    tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
       if(err){
         res.status(400);
         res.send(err);
         return;
       }
-      res.send(result);
+      var metadata = new grpc.Metadata();
+      metadata.add('authorization', tokenHelper.getRawToken(token));
+      req.body._id = req.params._id;
+      var fieldsToUpdate = [];
+      for(var key in req.body){
+        fieldsToUpdate[fieldsToUpdate.length] = key;
+      }
+      req.body.fieldsToUpdate = fieldsToUpdate;
+      console.log("field to update " + fieldsToUpdate);
+      orderClient.update(req.body, metadata, function(err, result){
+        if(err){
+          res.status(400);
+          res.send(err);
+          return;
+        }
+        res.send(result);
+      });
     });
-  });
+  }else{
+    res.status(400).send("No ID supplied");
+  }
 });
 
 orderRouter.del('/:_id', function(req, res, next){
@@ -88,7 +122,7 @@ orderRouter.del('/:_id', function(req, res, next){
     metadata.add('authorization', tokenHelper.getRawToken(token));
     var body = {}
     body._id = req.params._id;
-    tableClient.delete(body, metadata, function(err, result){
+    orderClient.delete(body, metadata, function(err, result){
       if(err){
         res.status(400);
         res.send(err);
