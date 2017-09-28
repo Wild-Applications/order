@@ -12,7 +12,7 @@ var orderDescriptor = grpc.load(__dirname + '/../proto/order.proto').order;
 var orderClient = new orderDescriptor.FulfilmentService('service.fulfilment:1295', grpc.credentials.createInsecure());
 
 
-orderRouter.get('/', function(req, res, next){
+orderRouter.get('/pending', function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
