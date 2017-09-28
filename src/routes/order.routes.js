@@ -13,6 +13,7 @@ var orderClient = new orderDescriptor.FulfilmentService('service.fulfilment:1295
 
 
 orderRouter.get('/pending', function(req, res, next){
+  console.log("Request at order/pending");
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
@@ -23,7 +24,7 @@ orderRouter.get('/pending', function(req, res, next){
 
     var metadata = new grpc.Metadata();
     metadata.add('authorization', tokenHelper.getRawToken(token));
-    orderClient.getAll({}, metadata, function(err, result){
+    orderClient.getPending({}, metadata, function(err, result){
       if(err){
         res.send(err)
       }else{
