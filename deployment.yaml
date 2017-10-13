@@ -31,7 +31,7 @@ spec:
       containers:
       - name: order
         image: wildapplications/order:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         env:

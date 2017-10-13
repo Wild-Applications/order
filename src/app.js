@@ -81,7 +81,7 @@ server.use(cors.actual);
 
 
 var orderRoutes = require('./routes/order.routes.js');
-orderRoutes.applyRoutes(server, '/');
+orderRoutes.applyRoutes(server, '');
 
 
 //

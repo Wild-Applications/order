@@ -100,6 +100,28 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
   });
 });
 
+orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res,next){
+  console.log("Yep we reached here");
+  var token = req.header('Authorization');
+  tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
+    if(err){
+      res.status(400);
+      res.send(err);
+      return;
+    }
+    var metadata = new grpc.Metadata();
+    metadata.add('authorization', tokenHelper.getRawToken(token));
+    orderClient.capturePayment({order: req.params.id}, metadata, function(err, result){
+      if(err){
+        res.status(400);
+        res.send(err);
+        return;
+      }
+      res.send(result);
+    });
+  });
+});
+
 orderRouter.put('/:_id', function(req, res, next){
   if(req.params._id){
     var token = req.header('Authorization');
