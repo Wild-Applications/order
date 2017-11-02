@@ -54,6 +54,31 @@ orderRouter.get('/complete', function(req, res, next){
   });
 });
 
+order.Router.get('/complete/:year/:month/:day', function(req, res, next){
+  if(req.params.year && req.params.month && req.params.day){
+    var token = req.header('Authorization');
+    tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
+      if(err){
+        res.status(400);
+        res.send(err);
+        return;
+      }
+
+      var metadata = new grpc.Metadata();
+      metadata.add('authorization', tokenHelper.getRawToken(token));
+      orderClient.getCompleted({year: req.params.year, month: req.params.month, day: req.params.day}, metadata, function(err, result){
+        if(err){
+          res.send(err)
+        }else{
+          res.send(result);
+        }
+      });
+    });
+  }else{
+    res.status(400).send('Not all parameters were supplied');
+  }
+})
+
 orderRouter.get('/:_id', function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
