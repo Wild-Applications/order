@@ -54,7 +54,7 @@ orderRouter.get('/complete', function(req, res, next){
   });
 });
 
-order.Router.get('/complete/:year/:month/:day', function(req, res, next){
+orderRouter.get('/complete/:year/:month/:day', function(req, res, next){
   if(req.params.year && req.params.month && req.params.day){
     var token = req.header('Authorization');
     tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
