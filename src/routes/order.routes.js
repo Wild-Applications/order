@@ -66,7 +66,7 @@ orderRouter.get('/complete/:year/:month/:day', function(req, res, next){
 
       var metadata = new grpc.Metadata();
       metadata.add('authorization', tokenHelper.getRawToken(token));
-      orderClient.getCompleted({year: req.params.year, month: req.params.month, day: req.params.day}, metadata, function(err, result){
+      orderClient.getCompletedByDay({year: req.params.year, month: req.params.month, day: req.params.day}, metadata, function(err, result){
         if(err){
           res.send(err)
         }else{
