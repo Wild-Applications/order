@@ -222,4 +222,26 @@ orderRouter.del('/:_id', function(req, res, next){
   });
 });
 
+orderRouter.post('/cancel/:_id', (req,res,next)=>{
+  var token = req.header('Authorization');
+  tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
+    if(err){
+      res.status(400).send(err);
+      return;
+    }
+    var metadata = new grpc.Metadata();
+    metadata.add('authorization', tokenHelper.getRawToken(token));
+    var body = {}
+    body._id = req.params._id;
+    orderClient.cancel(body, metadata, function(err, result){
+      if(err){
+        res.status(400);
+        res.send(err);
+        return;
+      }
+      res.send();
+    });
+  });
+});
+
 module.exports = orderRouter;
