@@ -236,6 +236,8 @@ orderRouter.post('/cancel/:_id', (req,res,next)=>{
     orderClient.cancel(body, metadata, function(err, result){
       if(err){
         res.status(400);
+        console.log('name',err.name);
+        console.log('messsage',err.message);
         res.send(err);
         return;
       }
