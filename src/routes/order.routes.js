@@ -146,6 +146,12 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
   });
 });
 
+orderRouter.post("/refunded", function(req, res, next){
+  console.log("WEBHOOK TRIGGERED");
+  console.log(req.body);
+  res.send({acknowledged: true});
+})
+
 orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res,next){
   console.log("Yep we reached here");
   var token = req.header('Authorization');
