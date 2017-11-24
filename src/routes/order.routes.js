@@ -147,13 +147,25 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
 });
 
 orderRouter.post("/refunded", function(req, res, next){
-  console.log("WEBHOOK TRIGGERED");
-  console.log(req.body);
-  res.send({acknowledged: true});
+  //order charge has been refunded. So we need to tell the payment service that its been refunded
+  //and then update the order in the fulfillment service
+  if(req.body && req.body.type == 'charge.refunded'){
+    orderClient.wasRefunded({charge_id: req.body.data.object.id}, (err, response){
+      if(err){
+        console.log('error ', err);
+        res.status(500);
+        res.send();
+      }
+      res.status(200);
+      console.log('response ', response;)
+      res.send(response);
+    })
+  }else{
+    res.send({acknowledged: false});
+  }
 })
 
 orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res,next){
-  console.log("Yep we reached here");
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
