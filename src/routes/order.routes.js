@@ -157,7 +157,7 @@ orderRouter.post("/refunded", function(req, res, next){
         res.send();
       }
       res.status(200);
-      console.log('response ', response;)
+      console.log('response ', response);
       res.send(response);
     })
   }else{
