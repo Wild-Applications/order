@@ -150,7 +150,7 @@ orderRouter.post("/refunded", function(req, res, next){
   //order charge has been refunded. So we need to tell the payment service that its been refunded
   //and then update the order in the fulfillment service
   if(req.body && req.body.type == 'charge.refunded'){
-    orderClient.wasRefunded({charge_id: req.body.data.object.id}, (err, response){
+    orderClient.wasRefunded({charge_id: req.body.data.object.id}, (err, response) => {
       if(err){
         console.log('error ', err);
         res.status(500);
