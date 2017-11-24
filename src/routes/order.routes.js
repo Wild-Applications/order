@@ -175,7 +175,7 @@ orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res
     }
     var metadata = new grpc.Metadata();
     metadata.add('authorization', tokenHelper.getRawToken(token));
-    orderClient.capturePayment({order: req.params.id}, metadata, function(err, result){
+    orderClient.complete({order: req.params.id}, metadata, function(err, result){
       if(err){
         res.status(400);
         res.send(err);
