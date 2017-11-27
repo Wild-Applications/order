@@ -152,12 +152,10 @@ orderRouter.post("/refunded", function(req, res, next){
   if(req.body && req.body.type == 'charge.refunded'){
     orderClient.wasRefunded({charge_id: req.body.data.object.id}, (err, response) => {
       if(err){
-        console.log('error ', err);
         res.status(500);
         res.send();
       }
       res.status(200);
-      console.log('response ', response);
       res.send(response);
     })
   }else{
@@ -177,7 +175,7 @@ orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res
     metadata.add('authorization', tokenHelper.getRawToken(token));
     orderClient.complete({order: req.params.id}, metadata, function(err, result){
       if(err){
-        console.log('err.status ', err.status);
+        console.log('err.code ', err.code);
         res.status(400);
         res.send(err);
         return;
