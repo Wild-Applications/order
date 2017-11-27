@@ -175,11 +175,8 @@ orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res
     metadata.add('authorization', tokenHelper.getRawToken(token));
     orderClient.complete({order: req.params.id}, metadata, function(err, result){
       if(err){
-        console.log('whole error', err);
-        console.log('err.code ', err.code);
-        console.log('err.status', err.status);
-        console.log('err.metadata', err.metadata);
-        res.status(400);
+        res.status(err.code || 500);
+        console.log(err.metadata.get('error_code'));
         res.send(err);
         return;
       }
