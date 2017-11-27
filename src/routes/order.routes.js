@@ -177,6 +177,7 @@ orderRouter.post("/complete/:id", verifyToken({secret:secret}), function(req,res
       if(err){
         console.log('err.code ', err.code);
         console.log('err.status', err.status);
+        console.log('err.name', err.name);
         res.status(400);
         res.send(err);
         return;
