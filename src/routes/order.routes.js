@@ -12,7 +12,7 @@ var orderDescriptor = grpc.load(__dirname + '/../proto/order.proto').order;
 var orderClient = new orderDescriptor.FulfilmentService('service.fulfilment:1295', grpc.credentials.createInsecure());
 
 
-orderRouter.get('/pending', function(req, res, next){
+orderRouter.get('/pending', verifyToken({secret:secret}), function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
@@ -33,7 +33,7 @@ orderRouter.get('/pending', function(req, res, next){
   });
 });
 
-orderRouter.get('/complete', function(req, res, next){
+orderRouter.get('/complete', verifyToken({secret:secret}), function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
@@ -54,7 +54,7 @@ orderRouter.get('/complete', function(req, res, next){
   });
 });
 
-orderRouter.get('/complete/:year/:month/:day', function(req, res, next){
+orderRouter.get('/complete/:year/:month/:day', verifyToken({secret:secret}), function(req, res, next){
   if(req.params.year && req.params.month && req.params.day){
     var token = req.header('Authorization');
     tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
@@ -79,7 +79,7 @@ orderRouter.get('/complete/:year/:month/:day', function(req, res, next){
   }
 });
 
-orderRouter.get('/complete/breakdown', function(req, res, next){
+orderRouter.get('/complete/breakdown', verifyToken({secret:secret}), function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
@@ -91,6 +91,27 @@ orderRouter.get('/complete/breakdown', function(req, res, next){
     var metadata = new grpc.Metadata();
     metadata.add('authorization', tokenHelper.getRawToken(token));
     orderClient.getOrderBreakdown({}, metadata, function(err, result){
+      if(err){
+        res.send(err)
+      }else{
+        res.send(result);
+      }
+    });
+  });
+});
+
+orderRouter.get('/statistics', verifyToken({secret:secret}), function(req, res, next){
+  var token = req.header('Authorization');
+  tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
+    if(err){
+      res.status(400);
+      res.send(err);
+      return;
+    }
+
+    var metadata = new grpc.Metadata();
+    metadata.add('authorization', tokenHelper.getRawToken(token));
+    orderClient.getStatistics({}, metadata, function(err, result){
       if(err){
         res.send(err)
       }else{
