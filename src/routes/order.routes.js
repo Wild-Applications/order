@@ -158,7 +158,7 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
     orderToCreate.owner = decodedToken.sub;
     orderClient.create(orderToCreate, metadata, function(err, result){
       if(err){
-        res.status(400);
+        res.status(err.code || 500);
         res.send(err);
         console.log('err', err);
         return;
