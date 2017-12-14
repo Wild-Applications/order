@@ -160,8 +160,10 @@ orderRouter.post("/", verifyToken({secret:secret}), function(req,res,next){
       if(err){
         res.status(400);
         res.send(err);
+        console.log('err', err);
         return;
       }
+      console.log('result', result);
       res.send(result);
     });
   });
