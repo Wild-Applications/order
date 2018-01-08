@@ -121,7 +121,7 @@ orderRouter.get('/statistics', verifyToken({secret:secret}), function(req, res, 
   });
 });
 
-orderRouter.get('/:_id', function(req, res, next){
+orderRouter.get('/:_id', verifyToken({secret: secret}), function(req, res, next){
   var token = req.header('Authorization');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
