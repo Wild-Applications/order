@@ -14,6 +14,7 @@ var orderClient = new orderDescriptor.FulfilmentService('service.fulfilment:1295
 
 orderRouter.get('/pending', verifyToken({secret:secret}), function(req, res, next){
   var token = req.header('Authorization');
+  console.log('Received Request');
   tokenHelper.getTokenContent(token, secret, function(err, decodedToken){
     if(err){
       res.status(400);
