@@ -114,7 +114,8 @@ orderRouter.get('/statistics', verifyToken({secret:secret}), function(req, res, 
     metadata.add('authorization', tokenHelper.getRawToken(token));
     orderClient.getStatistics({}, metadata, function(err, result){
       if(err){
-        res.send(err)
+        res.status(err.code || 500);
+        res.send(err.message);
       }else{
         res.send(result);
       }
